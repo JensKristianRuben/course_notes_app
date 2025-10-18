@@ -1,0 +1,27 @@
+{
+  "name": "app.js",
+  "version": "0.0.1",
+  "description": "course notes for node.js",
+  "keywords": [
+    "[school",
+    "node.js",
+    "project]"
+  ],
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env PORT=8080 nodemon --ext js,html,json app.js",
+    "startWinCMD": "set PORT=8080 && nodemon app.js",
+    "startWinPowershell": "$env:PORT='8080'; nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "marked": "^16.4.0"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  }
+}
