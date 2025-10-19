@@ -13,10 +13,6 @@ const __dirname = dirname(__filename);
 
 //=========================================MARKDOWN FILES=============================
 
-const markdownHtmlFiles = readAndParseMarkdownFiles();
-const readmeHtml = readAndParseMarkdownFile();
-
-function readAndParseMarkdownFiles() {
   const htmlFiles = {};
   const markdownPath = path.join(__dirname, "markdown");
   const markdownFileNames = fs.readdirSync(markdownPath);
@@ -31,18 +27,14 @@ function readAndParseMarkdownFiles() {
     htmlFiles[file] = highlightedHtmlFiles;
   }
 
-  return htmlFiles;
-}
 
-function readAndParseMarkdownFile() {
   const readmePath = path.join(__dirname, "README.md");
   const readmeFileString = fs.readFileSync(readmePath, "utf-8");
   const readmeFileStringToHtml = marked.parse(readmeFileString);
 
   const highlightedHtml = highlightHtml(readmeFileStringToHtml);
 
-  return highlightedHtml;
-}
+
 
 function highlightHtml(htmlString) {
   const dom = new JSDOM(htmlString);
@@ -81,7 +73,7 @@ const fourZeroFourPage = fs.readFileSync(fourZeroFourPagePath, "utf-8");
 
 app.get("/markdown/:file", async (req, res) => {
   const fileName = req.params.file;
-  const htmlToSend = markdownHtmlFiles[fileName];
+  const htmlToSend = htmlFiles[fileName];
 
   if (!fs.existsSync(path.join(__dirname, "markdown", fileName))) {
     // tjekker om filen eksisterer {
@@ -97,7 +89,7 @@ app.get("/markdown/:file", async (req, res) => {
 
 app.get("/", (req, res) => {
   const indexPageToSend = indexPage
-    .replace("$$MARKDOWNCONTENT$$", readmeHtml)
+    .replace("$$MARKDOWNCONTENT$$", highlightedHtml)
     .replace("$$TITLE$$", "Course_notes_app");
 
   res.send(indexPageToSend);
