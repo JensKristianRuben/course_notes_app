@@ -53,8 +53,8 @@ app.get("/", (req, res) => {
 
 
 // app.use() skal ligge under "/" endpointet - ellers læser express index filen før den muteres
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "public", "images")));
+// app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static(path.join(__dirname, "public", "images")));
 
 
 // ========================================CONFIG========================================

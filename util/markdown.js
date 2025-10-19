@@ -1,7 +1,7 @@
 import {promises as fs} from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { marked, Renderer } from "marked";
+import { marked } from "marked";
 import hljs from "highlight.js";
 import { JSDOM } from "jsdom";
 
