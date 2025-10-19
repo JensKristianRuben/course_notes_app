@@ -21,15 +21,14 @@ app.use(express.static(path.join(__dirname, "public", "images")));
   const markdownPath = path.join(__dirname, "markdown");
   const markdownFileNames = fs.readdirSync(markdownPath);
 
-  for (const file of markdownFileNames) {
-    const markdownFileString = fs.readFileSync(
-      path.join(markdownPath, file),
-      "utf-8"
-    );
-    const markdownFileStringToHTML = marked.parse(markdownFileString);
-    const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
-    htmlFiles[file] = highlightedHtmlFiles;
-  }
+  markdownFileNames.forEach(file => {
+  const markdownFileString = fs.readFileSync(path.join(markdownPath, file)).toString();
+
+  const markdownFileStringToHTML = marked.parse(markdownFileString);
+  const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
+  htmlFiles[file] = highlightedHtmlFiles;
+});
+
 
 
   const readmePath = path.join(__dirname, "README.md");
