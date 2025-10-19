@@ -1,5 +1,5 @@
 import express from "express";
-import { promises as fs } from "fs";
+import fs from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { readAndParseMarkdownFiles, readAndParseMarkdownFile } from "./util/markdown.js";
@@ -16,41 +16,31 @@ const __dirname = dirname(__filename);
 //=========================================MARKDOWN FILES=============================
 
 
-let markdownHtmlFiles = {};
-let readmeHtml = "";
-let indexPage = "";
-let fourZeroFourPage = "";
 
 
-async function init() {
-  try {
+
+
     const indexPagePath = path.join(__dirname, "public", "index.html");
     const fourZeroFourPagePath = path.join(__dirname, "public", "404.html");
 
-    indexPage = await fs.readFile(indexPagePath, "utf-8");
-    fourZeroFourPage = await fs.readFile(fourZeroFourPagePath, "utf-8");
+    const indexPage = fs.readFileSync(indexPagePath, "utf-8");
+    const fourZeroFourPage = fs.readFileSync(fourZeroFourPagePath, "utf-8");
 
 
-    markdownHtmlFiles = await readAndParseMarkdownFiles();
-    readmeHtml = await readAndParseMarkdownFile();
+    const markdownHtmlFiles = readAndParseMarkdownFiles();
+    const readmeHtml = readAndParseMarkdownFile();
 
-    console.log("✅ Markdown files and templates loaded successfully");
-  } catch (err) {
-    console.error("❌ Initialization failed:", err);
-  }
-}
 // ========================================PAGES========================================
 
 app.get("/markdown/:file", async (req, res) => {
   const fileName = req.params.file;
   const htmlToSend = markdownHtmlFiles[fileName]  
 
-  try {
-    await fs.access(path.join(__dirname, "markdown", fileName)); // tjekker om filen eksisterer
-  } catch {
-  return res.status(404).send(fourZeroFourPage);
-  }
 
+  if(!fs.existsSync(path.join(__dirname, "markdown", fileName))){; // tjekker om filen eksisterer {
+    return res.status(404).send(fourZeroFourPage);
+  }
+   
   const indexPageToSend = indexPage
     .replace("$$MARKDOWNCONTENT$$", htmlToSend)
     .replace("$$TITLE$$", `Course_notes_app | ${fileName}`);
@@ -79,8 +69,7 @@ app.use(express.static(path.join(__dirname, "public", "images")));
 const PORT = Number(process.env.PORT);
 
 
-init().then(() => {
-  app.listen(PORT, () => {
+
+app.listen(PORT, () => {
     console.log(`🚀🚀🚀🚀🚀🚀🚀🚀 Server is running on port ${PORT} 🚀🚀🚀🚀🚀🚀🚀🚀`);
   });
-});
