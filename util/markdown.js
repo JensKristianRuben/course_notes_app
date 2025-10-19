@@ -1,31 +1,65 @@
 import fs from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { marked } from "marked";
+import { marked, Renderer } from "marked";
+import hljs from "highlight.js";
+import { JSDOM } from "jsdom";
 
-const __filename = fileURLToPath(import.meta.url); 
-const __dirname = dirname(__filename); 
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export function readAndParseMarkdownFiles() {
-    const htmlFiles = {};
-    const markdownPath = path.join(__dirname, "../markdown");
-    const markdownFileNames = fs.readdirSync(markdownPath);
-    
-    markdownFileNames.forEach(file => {
-      const markdownFileString = fs.readFileSync(path.join(markdownPath, file)).toString()
-      const markdownFileStringToHTML = marked.parse(markdownFileString);
-      
-      htmlFiles[file] = markdownFileStringToHTML; // Jeg undrer mig lidt over den her syntaks, og hvorfor man ikke kan brug dot syntaksen
-    });
+  const htmlFiles = {};
+  const markdownPath = path.join(__dirname, "../markdown");
+  const markdownFileNames = fs.readdirSync(markdownPath);
 
-    return htmlFiles;
+  markdownFileNames.forEach((file) => {
+    const markdownFileString = fs
+      .readFileSync(path.join(markdownPath, file))
+      .toString();
+    const markdownFileStringToHTML = marked.parse(markdownFileString);
+
+    const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
+
+    htmlFiles[file] = highlightedHtmlFiles; // Jeg undrer mig lidt over den her syntaks, og hvorfor man ikke kan brug dot syntaksen
+  });
+
+  return htmlFiles;
 }
 
 export function readAndParseMarkdownFile() {
-    const readmePath = path.join(__dirname, "../README")
-    const readmeFileString = fs.readFileSync(readmePath).toString();
-    const readmeFileStringToHtml = marked.parse(readmeFileString);
+  const readmePath = path.join(__dirname, "../README");
+  const readmeFileString = fs.readFileSync(readmePath).toString();
+  const readmeFileStringToHtml = marked.parse(readmeFileString);
 
-    return readmeFileStringToHtml;
+  const highlightedHtml = highlightHtml(readmeFileStringToHtml);
+
+  return highlightedHtml;
+}
+
+function highlightHtml(htmlString) {
+  const dom = new JSDOM(htmlString);
+  const codes = dom.window.document.querySelectorAll("pre code");
+
+  codes.forEach((codeElement) => {
+    const langClass = codeElement.className || "";
+    const lang = langClass.replace("language-", "") || undefined;
+
+    let highlighted;
+
+    if (lang && hljs.getLanguage(lang)) {
+      highlighted = hljs.highlight(codeElement.textContent, {
+        language: lang,
+        ignoreIllegals: true,
+      }).value;
+    } else {
+      highlighted = hljs.highlightAuto(codeElement.textContent).value;
+    }
+
+    codeElement.innerHTML = highlighted;
+    if (!codeElement.classList.contains("hljs"))
+      codeElement.classList.add("hljs");
+  });
+
+  return dom.serialize();
 }

@@ -5,10 +5,14 @@ import { fileURLToPath } from "url";
 import { readAndParseMarkdownFiles } from "./util/markdown.js";
 import { readAndParseMarkdownFile } from "./util/markdown.js";
 
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = dirname(__filename); 
+
+
+
 
 //=========================================MARKDOWN FILES=============================
 
