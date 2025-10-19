@@ -37,7 +37,6 @@ async function init() {
     console.log("✅ Markdown files and templates loaded successfully");
   } catch (err) {
     console.error("❌ Initialization failed:", err);
-    process.exit(1);
   }
 }
 // ========================================PAGES========================================
