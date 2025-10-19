@@ -2,8 +2,7 @@ import express from "express";
 import fs from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { readAndParseMarkdownFiles } from "./util/markdown.js";
-import { readAndParseMarkdownFile } from "./util/markdown.js";
+import { readAndParseMarkdownFiles, readAndParseMarkdownFile } from "./util/markdown.js";
 
 
 const app = express();
@@ -14,17 +13,32 @@ const __dirname = dirname(__filename);
 
 //=========================================MARKDOWN FILES=============================
 
-const markdownHtmlFiles = await readAndParseMarkdownFiles();
-const readmeHtml =  await readAndParseMarkdownFile();
+
+let markdownHtmlFiles = {};
+let readmeHtml = "";
+let indexPage = "";
+let fourZeroFourPage = "";
 
 
+async function init() {
+  try {
+    const indexPagePath = path.join(__dirname, "public", "index.html");
+    const fourZeroFourPagePath = path.join(__dirname, "public", "404.html");
 
+    indexPage = await fs.promises.readFile(indexPagePath, "utf-8");
+    fourZeroFourPage = await fs.promises.readFile(fourZeroFourPagePath, "utf-8");
+
+
+    markdownHtmlFiles = await readAndParseMarkdownFiles();
+    readmeHtml = await readAndParseMarkdownFile();
+
+    console.log("✅ Markdown files and templates loaded successfully");
+  } catch (err) {
+    console.error("❌ Initialization failed:", err);
+    process.exit(1);
+  }
+}
 // ========================================PAGES========================================
-const indexPagePath = path.join(__dirname, "public", "index.html");
-let indexPage = fs.readFileSync(indexPagePath).toString();
-
-const fourZeroFourPagePath = path.join(__dirname, `public`, "404.html");
-const fourZeroFourPage = fs.readFileSync(fourZeroFourPagePath).toString();
 
 app.get("/markdown/:file", (req, res) => {
   const fileName = req.params.file;
@@ -53,12 +67,16 @@ app.get("/", (req, res) => {
 
 
 // app.use() skal ligge under "/" endpointet - ellers læser express index filen før den muteres
-// app.use(express.static(path.join(__dirname, "public")));
-// app.use(express.static(path.join(__dirname, "public", "images")));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public", "images")));
 
 
 // ========================================CONFIG========================================
 const PORT = Number(process.env.PORT);
-app.listen(PORT, () => {
-  console.log("Server is running on: ", PORT);
+
+
+init().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀🚀🚀🚀🚀🚀🚀🚀 Server is running on port ${PORT} 🚀🚀🚀🚀🚀🚀🚀🚀`);
+  });
 });
