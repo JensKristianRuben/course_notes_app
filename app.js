@@ -29,15 +29,11 @@ app.use(express.static(path.join(__dirname, "public", "images")));
   htmlFiles[file] = highlightedHtmlFiles;
 });
 
-
-
   const readmePath = path.join(__dirname, "README.md");
   const readmeFileString = fs.readFileSync(readmePath, "utf-8");
   const readmeFileStringToHtml = marked.parse(readmeFileString);
 
   const highlightedHtml = highlightHtml(readmeFileStringToHtml);
-
-
 
 function highlightHtml(htmlString) {
   const dom = new JSDOM(htmlString);
@@ -74,7 +70,7 @@ const fourZeroFourPagePath = path.join(__dirname, "public", "404.html");
 const indexPage = fs.readFileSync(indexPagePath, "utf-8");
 const fourZeroFourPage = fs.readFileSync(fourZeroFourPagePath, "utf-8");
 
-app.get("/markdown/:file", async (req, res) => {
+app.get("/markdown/:file", (req, res) => {
   const fileName = req.params.file;
   const htmlToSend = htmlFiles[fileName];
 
