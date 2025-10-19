@@ -20,7 +20,7 @@ export async function readAndParseMarkdownFiles() {
     htmlFiles[file] = highlightedHtmlFiles;
   }
 
-  return htmlFiles;
+  return markdownFileStringToHTML;
 }
 
 export async function readAndParseMarkdownFile() {
@@ -28,9 +28,9 @@ export async function readAndParseMarkdownFile() {
   const readmeFileString = await fs.readFile(readmePath, "utf-8");
   const readmeFileStringToHtml = marked.parse(readmeFileString);
 
-  const highlightedHtml = highlightHtml(readmeFileStringToHtml);
+//   const highlightedHtml = highlightHtml(readmeFileStringToHtml);
 
-  return highlightedHtml;
+  return readmeFileStringToHtml;
 }
 
 function highlightHtml(htmlString) {
