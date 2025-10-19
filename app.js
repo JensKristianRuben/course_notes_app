@@ -11,9 +11,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// app.use() skal ligge under "/" endpointet - ellers læser express index filen før den muteres
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "public", "images")));
+
 
 //=========================================MARKDOWN FILES=============================
 
@@ -25,15 +23,15 @@ app.use(express.static(path.join(__dirname, "public", "images")));
   const markdownFileString = fs.readFileSync(path.join(markdownPath, file)).toString();
 
   const markdownFileStringToHTML = marked.parse(markdownFileString);
-  const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
-  htmlFiles[file] = highlightedHtmlFiles;
+  // const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
+  htmlFiles[file] = markdownFileStringToHTML;
 });
 
   const readmePath = path.join(__dirname, "README.md");
   const readmeFileString = fs.readFileSync(readmePath, "utf-8");
   const readmeFileStringToHtml = marked.parse(readmeFileString);
 
-  const highlightedHtml = highlightHtml(readmeFileStringToHtml);
+  // const highlightedHtml = highlightHtml(readmeFileStringToHtml);
 
 function highlightHtml(htmlString) {
   const dom = new JSDOM(htmlString);
@@ -75,26 +73,31 @@ app.get("/markdown/:file", (req, res) => {
   const htmlToSend = htmlFiles[fileName];
 
   if (!fs.existsSync(path.join(__dirname, "markdown", fileName))) {
-    // tjekker om filen eksisterer {
     return res.status(404).send(fourZeroFourPage);
   }
 
+  const testHtmltoSend = highlightHtml(htmlToSend)
   const indexPageToSend = indexPage
-    .replace("$$MARKDOWNCONTENT$$", htmlToSend)
+    .replace("$$MARKDOWNCONTENT$$", testHtmltoSend)
     .replace("$$TITLE$$", `Course_notes_app | ${fileName}`);
 
   res.send(indexPageToSend);
 });
 
 app.get("/", (req, res) => {
+
+
+  const testFileToSend = highlightHtml(readmeFileStringToHtml);
   const indexPageToSend = indexPage
-    .replace("$$MARKDOWNCONTENT$$", highlightedHtml)
+    .replace("$$MARKDOWNCONTENT$$", testFileToSend)
     .replace("$$TITLE$$", "Course_notes_app");
 
   res.send(indexPageToSend);
 });
 
-
+// app.use() skal ligge under "/" endpointet - ellers læser express index filen før den muteres
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public", "images")));
 
 // ========================================CONFIG========================================
 const PORT = Number(process.env.PORT);
