@@ -16,11 +16,12 @@ export async function readAndParseMarkdownFiles() {
   for (const file of markdownFileNames) {
     const markdownFileString = await fs.readFile(path.join(markdownPath, file),"utf-8");
     const markdownFileStringToHTML = marked.parse(markdownFileString);
-    const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
-    htmlFiles[file] = highlightedHtmlFiles;
+    // const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
+    htmlFiles[file] = markdownFileStringToHTML;
   }
 
-  return markdownFileStringToHTML;
+
+  return htmlFiles;
 }
 
 export async function readAndParseMarkdownFile() {
@@ -33,29 +34,29 @@ export async function readAndParseMarkdownFile() {
   return readmeFileStringToHtml;
 }
 
-function highlightHtml(htmlString) {
-  const dom = new JSDOM(htmlString);
-  const codes = dom.window.document.querySelectorAll("pre code");
+// function highlightHtml(htmlString) {
+//   const dom = new JSDOM(htmlString);
+//   const codes = dom.window.document.querySelectorAll("pre code");
 
-  codes.forEach((codeElement) => {
-    const langClass = codeElement.className || "";
-    const lang = langClass.replace("language-", "") || undefined;
+//   codes.forEach((codeElement) => {
+//     const langClass = codeElement.className || "";
+//     const lang = langClass.replace("language-", "") || undefined;
 
-    let highlighted;
+//     let highlighted;
 
-    if (lang && hljs.getLanguage(lang)) {
-      highlighted = hljs.highlight(codeElement.textContent, {
-        language: lang,
-        ignoreIllegals: true,
-      }).value;
-    } else {
-      highlighted = hljs.highlightAuto(codeElement.textContent).value;
-    }
+//     if (lang && hljs.getLanguage(lang)) {
+//       highlighted = hljs.highlight(codeElement.textContent, {
+//         language: lang,
+//         ignoreIllegals: true,
+//       }).value;
+//     } else {
+//       highlighted = hljs.highlightAuto(codeElement.textContent).value;
+//     }
 
-    codeElement.innerHTML = highlighted;
-    if (!codeElement.classList.contains("hljs"))
-      codeElement.classList.add("hljs");
-  });
+//     codeElement.innerHTML = highlighted;
+//     if (!codeElement.classList.contains("hljs"))
+//       codeElement.classList.add("hljs");
+//   });
 
-  return dom.serialize();
-}
+//   return dom.serialize();
+// }

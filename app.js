@@ -10,9 +10,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = dirname(__filename); 
 
-// app.use() skal ligge under "/" endpointet - ellers læser express index filen før den muteres
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "public", "images")));
+
 
 
 //=========================================MARKDOWN FILES=============================
@@ -73,6 +71,9 @@ app.get("/", (req, res) => {
 
 
 
+// app.use() skal ligge under "/" endpointet - ellers læser express index filen før den muteres
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public", "images")));
 
 
 // ========================================CONFIG========================================
