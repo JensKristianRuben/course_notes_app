@@ -1,5 +1,5 @@
 import express from "express";
-import fs from "fs";
+import { promises as fs } from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { readAndParseMarkdownFiles, readAndParseMarkdownFile } from "./util/markdown.js";
@@ -25,8 +25,8 @@ async function init() {
     const indexPagePath = path.join(__dirname, "public", "index.html");
     const fourZeroFourPagePath = path.join(__dirname, "public", "404.html");
 
-    indexPage = await fs.promises.readFile(indexPagePath, "utf-8");
-    fourZeroFourPage = await fs.promises.readFile(fourZeroFourPagePath, "utf-8");
+    indexPage = await fs.readFile(indexPagePath, "utf-8");
+    fourZeroFourPage = await fs.readFile(fourZeroFourPagePath, "utf-8");
 
 
     markdownHtmlFiles = await readAndParseMarkdownFiles();
@@ -40,12 +40,14 @@ async function init() {
 }
 // ========================================PAGES========================================
 
-app.get("/markdown/:file", (req, res) => {
+app.get("/markdown/:file", async (req, res) => {
   const fileName = req.params.file;
   const htmlToSend = markdownHtmlFiles[fileName]  
 
-  if (!fs.existsSync(path.join(__dirname, "markdown/", `${fileName}`))) {
-    return res.status(404).send(fourZeroFourPage)
+  try {
+    await fs.access(path.join(__dirname, "markdown", fileName)); // tjekker om filen eksisterer
+  } catch {
+  return res.status(404).send(fourZeroFourPage);
   }
 
   const indexPageToSend = indexPage
