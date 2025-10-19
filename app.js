@@ -2,32 +2,18 @@ import express from "express";
 import fs from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { marked } from "marked";
+import { readAndParseMarkdownFiles } from "./util/markdown.js";
+import { readAndParseMarkdownFile } from "./util/markdown.js";
 
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = dirname(__filename); 
 
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "public", "images")));
-// ========================================API========================================
-
-
 //=========================================MARKDOWN FILES=============================
 
-const htmlFiles = {};
-
-const markdownPath = path.join(__dirname, "markdown");
-const markdownFileNames = fs.readdirSync(markdownPath);
-
-markdownFileNames.forEach(file => {
-  const markdownFileString = fs.readFileSync(path.join(markdownPath, file)).toString()
-  const markdownFileStringToHTML = marked.parse(markdownFileString);
-  
-  htmlFiles[file] = markdownFileStringToHTML; // Jeg undrer mig lidt over den her syntaks, og hvorfor man ikke kan brug dot syntaksen
-});
-
+const markdownHtmlFiles = readAndParseMarkdownFiles();
+const readmeHtml =  readAndParseMarkdownFile();
 
 
 
@@ -40,23 +26,34 @@ const fourZeroFourPage = fs.readFileSync(fourZeroFourPagePath).toString();
 
 app.get("/markdown/:file", (req, res) => {
   const fileName = req.params.file;
-  const htmlToSend = htmlFiles[fileName]  
+  const htmlToSend = markdownHtmlFiles[fileName]  
 
   if (!fs.existsSync(path.join(__dirname, "markdown/", `${fileName}`))) {
-    res.status(404).send(fourZeroFourPage)
+    return res.status(404).send(fourZeroFourPage)
   }
 
   const indexPageToSend = indexPage
     .replace("$$MARKDOWNCONTENT$$", htmlToSend)
-    .replace("$$TITLE$$", `Fullstack node.js notes - ${fileName}`);
+    .replace("$$TITLE$$", `Course_notes_app | ${fileName}`);
 
   res.send(indexPageToSend);
 });
 
 
 app.get("/", (req, res) => {
-  res.send(indexPage);
+
+  const indexPageToSend = indexPage
+  .replace("$$MARKDOWNCONTENT$$", readmeHtml)
+  .replace("$$TITLE$$", "Course_notes_app")
+
+  res.send(indexPageToSend);
 });
+
+
+// app.use() skal ligge under "/" endpointet - ellers læser express index filen før den muteres
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public", "images")));
+
 
 // ========================================CONFIG========================================
 const PORT = Number(process.env.PORT);
