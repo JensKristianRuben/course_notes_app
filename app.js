@@ -10,27 +10,18 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = dirname(__filename); 
 
-
-
-
 //=========================================MARKDOWN FILES=============================
 
+    const markdownHtmlFiles = readAndParseMarkdownFiles();
+    const readmeHtml = readAndParseMarkdownFile();
 
-
-
-
+// ========================================PAGES========================================
 
     const indexPagePath = path.join(__dirname, "public", "index.html");
     const fourZeroFourPagePath = path.join(__dirname, "public", "404.html");
 
     const indexPage = fs.readFileSync(indexPagePath, "utf-8");
     const fourZeroFourPage = fs.readFileSync(fourZeroFourPagePath, "utf-8");
-
-
-    const markdownHtmlFiles = readAndParseMarkdownFiles();
-    const readmeHtml = readAndParseMarkdownFile();
-
-// ========================================PAGES========================================
 
 app.get("/markdown/:file", async (req, res) => {
   const fileName = req.params.file;
