@@ -14,8 +14,8 @@ const __dirname = dirname(__filename);
 
 //=========================================MARKDOWN FILES=============================
 
-const markdownHtmlFiles = readAndParseMarkdownFiles();
-const readmeHtml =  readAndParseMarkdownFile();
+const markdownHtmlFiles = await readAndParseMarkdownFiles();
+const readmeHtml =  await readAndParseMarkdownFile();
 
 
 

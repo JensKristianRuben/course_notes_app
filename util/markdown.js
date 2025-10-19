@@ -1,4 +1,4 @@
-import fs from "fs";
+import {promises as fs} from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { marked, Renderer } from "marked";
@@ -8,28 +8,24 @@ import { JSDOM } from "jsdom";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export function readAndParseMarkdownFiles() {
+export async function readAndParseMarkdownFiles() {
   const htmlFiles = {};
   const markdownPath = path.join(__dirname, "../markdown");
-  const markdownFileNames = fs.readdirSync(markdownPath);
+  const markdownFileNames = await fs.readdir(markdownPath);
 
-  markdownFileNames.forEach((file) => {
-    const markdownFileString = fs
-      .readFileSync(path.join(markdownPath, file))
-      .toString();
+  for (const file of markdownFileNames) {
+    const markdownFileString = await fs.readFile(path.join(markdownPath, file),"utf-8");
     const markdownFileStringToHTML = marked.parse(markdownFileString);
-
     const highlightedHtmlFiles = highlightHtml(markdownFileStringToHTML);
-
-    htmlFiles[file] = highlightedHtmlFiles; // Jeg undrer mig lidt over den her syntaks, og hvorfor man ikke kan brug dot syntaksen
-  });
+    htmlFiles[file] = highlightedHtmlFiles;
+  }
 
   return htmlFiles;
 }
 
-export function readAndParseMarkdownFile() {
+export async function readAndParseMarkdownFile() {
   const readmePath = path.join(__dirname, "../README.md");
-  const readmeFileString = fs.readFileSync(readmePath).toString();
+  const readmeFileString = await fs.readFile(readmePath, "utf-8");
   const readmeFileStringToHtml = marked.parse(readmeFileString);
 
   const highlightedHtml = highlightHtml(readmeFileStringToHtml);
