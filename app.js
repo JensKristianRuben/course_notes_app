@@ -3,15 +3,11 @@ import fs from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { marked } from "marked";
-// import hljs from "highlight.js";
-// import { JSDOM } from "jsdom";
 
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-
 
 //=========================================MARKDOWN FILES=============================
 
@@ -30,32 +26,6 @@ const __dirname = dirname(__filename);
   const readmeFileString = fs.readFileSync(readmePath, "utf-8");
   const readmeFileStringToHtml = marked.parse(readmeFileString);
 
-// function highlightHtml(htmlString) {
-//   const dom = new JSDOM(htmlString);
-//   const codes = dom.window.document.querySelectorAll("pre code");
-
-//   codes.forEach((codeElement) => {
-//     const langClass = codeElement.className || "";
-//     const lang = langClass.replace("language-", "") || undefined;
-
-//     let highlighted;
-
-//     if (lang && hljs.getLanguage(lang)) {
-//       highlighted = hljs.highlight(codeElement.textContent, {
-//         language: lang,
-//         ignoreIllegals: true,
-//       }).value;
-//     } else {
-//       highlighted = hljs.highlightAuto(codeElement.textContent).value;
-//     }
-
-//     codeElement.innerHTML = highlighted;
-//     if (!codeElement.classList.contains("hljs"))
-//       codeElement.classList.add("hljs");
-//   });
-
-//   return dom.serialize();
-// }
 
 // ========================================PAGES========================================
 
@@ -73,7 +43,6 @@ app.get("/markdown/:file", (req, res) => {
     return res.status(404).send(fourZeroFourPage);
   }
 
-  // const testHtmltoSend = highlightHtml(htmlToSend)
   const indexPageToSend = indexPage
     .replace("$$MARKDOWNCONTENT$$", htmlToSend)
     .replace("$$TITLE$$", `Course_notes_app | ${fileName}`);
@@ -84,7 +53,7 @@ app.get("/markdown/:file", (req, res) => {
 app.get("/", (req, res) => {
 
 
-  // const testFileToSend = highlightHtml(readmeFileStringToHtml);
+
   const indexPageToSend = indexPage
     .replace("$$MARKDOWNCONTENT$$", readmeFileStringToHtml)
     .replace("$$TITLE$$", "Course_notes_app");
