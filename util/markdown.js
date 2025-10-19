@@ -28,7 +28,7 @@ export function readAndParseMarkdownFiles() {
 }
 
 export function readAndParseMarkdownFile() {
-  const readmePath = path.join(__dirname, "../README");
+  const readmePath = path.join(__dirname, "../README.md");
   const readmeFileString = fs.readFileSync(readmePath).toString();
   const readmeFileStringToHtml = marked.parse(readmeFileString);
 
